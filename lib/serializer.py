@@ -11,8 +11,15 @@ class GameState1DSerializer():
 
         # sledeca linija hvata samo prvi, prepravi da radi sa celom listom
 
-        old_state = replay["s"]
-        action = replay["a"]["action"].split(",")
+        try:
+            old_state = replay["s"]
+        except:
+            old_state = replay
+        
+        try:
+            old_state = json.loads(old_state["gameState"])
+        except:
+            pass
 
         json_map = old_state
         

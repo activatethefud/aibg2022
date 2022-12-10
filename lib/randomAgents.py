@@ -5,16 +5,20 @@ import numpy as np
 
 # gets out position from state
 def get_my_position(state) -> Tuple[int, int]:
+
+    state = agent_wrapper.fix_state(state)
+
     players = []
     
     try:
         ps = ['player1', 'player2', 'player3', 'player4']
         for pl in ps:
             players.append(state[pl])
-    except:
+    except Exception as e:
+        print(e)
         print("BAD STATE IN get_my_position()", str(state))
 
-    myself = [player for player in players if player["name"] == "JutricKafica"][0]
+    myself = [player for player in players if player["name"] == "JutricKafica1"][0]
 
     r = myself['r']
     q = myself['q']

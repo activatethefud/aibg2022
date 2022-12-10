@@ -3,6 +3,14 @@ import json
 import db
 import helper
 
+def fix_state(state):
+    try:
+        state = json.loads(state["gameState"])
+        return state
+    except:
+        return state
+
+
 SERVER_IP = 'aibg2022.com'
 CONNECTION_JSON = {
     'username': 'JutricKafica1',
@@ -36,7 +44,7 @@ def action(agent_id: str, old_state: dict, data: dict):
             def _myself_score(state: dict):
                 gameState = json.loads(state["gameState"])
                 players = gameState["scoreBoard"]["players"]
-                myself = [player for player in players if player["name"] == "JutricKafica"][0]
+                myself = [player for player in players if player["name"] == "JutricKafica1"][0]
                 return myself["score"]
 
             reward = _myself_score(new_state) - _myself_score(old_state)
@@ -67,7 +75,3 @@ def attack(agent_id: str, old_state: dict, x: int, y: int):
     return action(agent_id, old_state, {
         "action": f"attack,{x},{y}"
     })
-
-#move("test_agent", {"gameState": {"scoreBoard": {"players":[{"name":"JutricKafica","score":0}]}}}, -5,-7)
-
-#attack("test_agent", {"gameState": {"scoreBoard": {"players":[{"name":"JutricKafica","score":0}]}}}, -5,-7)
