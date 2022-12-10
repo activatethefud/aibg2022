@@ -123,15 +123,6 @@ def is_valid_attack_tile(pos, state) -> bool:
             typ = tile["entity"]['type']
             return typ == "BOSS" or typ == "ASTEROID" or is_player_on_tile(state, q, r)
 
-"""
-# checks if there is an object blocking out attack
-# (q,  r) is out position
-# (tq, tr) is the position of our target
-def exists_blocking_object(q: int, r: int, tq: int, tr: int) -> bool:
-
-    return False
-"""
-
 # checks if the given action is legal for the given state
 def is_valid_action(action: str, new_q: int, new_r: int, state) -> bool:
     q, r = get_my_position(state)
@@ -167,12 +158,47 @@ def pick_random_valid_action(state) -> Tuple[str, int, int]:
 
     return (action, q, r)
 
+def pick_rand_agg_action(state) -> Tuple[str, int, int]:
+    q, r = get_my_position(state)
+
+    action = 'attack'
+
+    dr_list = list([-3, -2, -1, 0, 1, 2, 3])
+    random.shuffle(dr_list)
+    dq_list = list([-3, -2, -1, 0, 1, 2, 3])
+    random.shuffle(dq_list)
+    
+    for dr in dr_list:
+        for dq in dq_list:
+            if is_valid_action(action, q, r, state):
+                q += dq
+                r += dr
+                print(f'will shoot')
+                return (action, q, r)
+
+    q, r = get_my_position(state)
+    action = 'move'
+    
+    dr_list = [-1, 0, 1]
+    random.shuffle(dr_list)
+    dq_list = [-1, 0, 1]
+    random.shuffle(dq_list)
+
+    for dr in dr_list:
+        for dq in dq_list:
+            if is_valid_action(action, q, r, state):
+                q += dq
+                r += dr
+                return (action, q, r)
+
+    return (action, q, r)
+
 # calls the agent_wrapper function to send the execute the given action
 # returns new state and a bool (True -> resp code 200 or 202, otherwise False)
 def do_action(agentID: str, oldState, action: str, x: int, y: int) -> Tuple[Any, Any]:
     state, isGoodResp = None, None
     if action == 'move':
-        state, isGoodResp = agent_wrapper.move(agentID, oldState,  x, y)
+        state, isGoodResp = agent_wrapper.move(agentID, oldState, x, y)
     else:
         state, isGoodResp = agent_wrapper.attack(agentID, oldState, x, y)
 
