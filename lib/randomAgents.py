@@ -4,7 +4,10 @@ from typing import Tuple, Any
 
 # gets out position from state
 def get_my_position(state) -> Tuple[int, int]:
-    players = state["scoreBoard"]["players"]
+    try:
+        players = state["scoreBoard"]["players"]
+    except:
+        print("BAD STATE IN get_my_position()", str(state))
     myself = [player for player in players if player["name"] == "JutricKafica"][0]
 
     r = myself['r']
@@ -117,12 +120,12 @@ def pick_random_valid_action(state) -> Tuple[str, int, int]:
 
 # calls the agent_wrapper function to send the execute the given action
 # returns new state and a bool (True -> resp code 200 or 202, otherwise False)
-def do_action(agentID: str, action: str, x: int, y: int) -> Tuple[Any, Any]:
+def do_action(agentID: str, oldState, action: str, x: int, y: int) -> Tuple[Any, Any]:
     state, isGoodResp = None, None
     if action == 'move':
-        state, isGoodResp = agent_wrapper.move(agentID, x, y)
+        state, isGoodResp = agent_wrapper.move(agentID, oldState,  x, y)
     else:
-        state, isGoodResp = agent_wrapper.attack(agentID, x, y)
+        state, isGoodResp = agent_wrapper.attack(agentID, oldState, x, y)
 
     return (state, isGoodResp)
 
