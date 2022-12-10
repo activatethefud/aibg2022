@@ -93,7 +93,3 @@ class GameState1DSerializer():
 
     def serialize_multiple(self, states: list):
         pass
-
-
-
-r = GameState1DSerializer().serialize_single(db.get_one_experience())

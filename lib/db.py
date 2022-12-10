@@ -4,7 +4,7 @@ import sys
 
 client = pymongo.MongoClient("mongodb://aibg:aibgmatf@fossmatrix.ml:27017/aibg2022")
 aibg_db = client.get_database("aibg2022")
-replay_buffer_collection = aibg_db.get_collection("replay_buffer")
+replay_buffer_collection = aibg_db.get_collection("replay_buffer1")
 
 try:
     print(client.server_info())
