@@ -1,6 +1,7 @@
 import random
 import agent_wrapper
 from typing import Tuple, Any
+import numpy as np
 
 # gets out position from state
 def get_my_position(state) -> Tuple[int, int]:
@@ -50,6 +51,23 @@ def is_valid_coords(pos) -> bool:
         return False
     return True
 
+def validateMapForValidXTileFunctions(map):
+    # print(f"validate map = {str(map)[:150]}")
+
+    for i in range(3):
+        if isinstance(map, list):
+            if isinstance(map[0], list):
+                l = []
+                for el in map:
+                    l += el
+                map = l
+        else: 
+            map = map['tiles']
+    
+    # print(f"after validate map = {str(map)[:150]}")
+
+    return map
+
 # checks if it is legal to move to position pos
 # does NOT check if the player is next to the pos 
 def is_valid_move_tile(pos, map) -> bool:
@@ -57,8 +75,10 @@ def is_valid_move_tile(pos, map) -> bool:
 
     if not is_valid_coords(pos):
         return False
-    
-    for tile in map['tiles']:
+
+    map = validateMapForValidXTileFunctions(map)
+
+    for tile in map:
         if int(tile['q']) == q and int(tile['r']) == r:
             return tile["tileType"] == "NORMAL"
 
@@ -68,8 +88,8 @@ def is_player_on_tile(state, q: int, r: int) -> bool:
     players = list([player for player in players])
 
     for player in players:
-        pq = players['q']
-        pr = players['r']
+        pq = player['q']
+        pr = player['r']
 
         if pq == q and pr == r:
             return True
@@ -84,16 +104,33 @@ def is_valid_attack_tile(pos, state) -> bool:
 
     if not is_valid_coords(pos):
         return False
-    
-    for tile in map['tiles']:
-        if int(tile['q']) == q and int(tile['r']) == r:
+
+    mapList = validateMapForValidXTileFunctions(map)
+
+    for tile in mapList:
+        #print(f'tile: {tile} \n---------------------\n')
+        # print(f'tile = {tile}')
+        qq = tile['q']
+        #print(f"qq = {qq}")
+        # if isinstance(qq, str):
+        #     qq = json.load(qq)
+
+        rr = tile['r']
+        # if isinstance(qq, str):
+        #     rr = json.load(rr)
+        
+        if int(qq) == q and int(qq) == r:
             typ = tile["entity"]['type']
             return typ == "BOSS" or typ == "ASTEROID" or is_player_on_tile(state, q, r)
 
+"""
 # checks if there is an object blocking out attack
 # (q,  r) is out position
-# (tq, tr) is 
-# def exists_blocking_object(q: int, r: int, tq: int, tr: int) -> bool:
+# (tq, tr) is the position of our target
+def exists_blocking_object(q: int, r: int, tq: int, tr: int) -> bool:
+
+    return False
+"""
 
 # checks if the given action is legal for the given state
 def is_valid_action(action: str, new_q: int, new_r: int, state) -> bool:
@@ -105,23 +142,28 @@ def is_valid_action(action: str, new_q: int, new_r: int, state) -> bool:
         if abs(q - new_q) > 1 or abs(r - new_r) > 1 or (new_q == 0 and new_r == 0):
             print("This is a fuckup in a PICK ACTION function, for MOVE action")
             return False
-        return is_valid_move_tile((new_q, new_r), state['tiles'])
+        
+        map = state['map']
+        map = validateMapForValidXTileFunctions(map)
+
+        return is_valid_move_tile((new_q, new_r), map)
     elif action == 'attack':
         if abs(q - new_q) > 3 or abs(r - new_r) > 3 or (new_q == 0 and new_r == 0):
             print("This is a fuckup in a PICK ACTION function, for ATTACK action")
             return False
-        # if exists_blocking_object(q, r, new_q, new_r):
-        #     return False
-        return is_valid_attack_tile(state)
+        return is_valid_attack_tile((new_q, new_r), state)
     else:
         print(f"This is a fuckup in a PICK ACTION function, invalid action: {action}")
         return False
 
 def pick_random_valid_action(state) -> Tuple[str, int, int]:
-    action, q, r = pick_rand_action()
+    action, q, r = pick_rand_action(state)
 
+    counter = 0
     while not is_valid_action(action, q, r, state):
-        action, q, r = pick_rand_action()
+        action, q, r = pick_rand_action(state)
+        if counter > 10 and counter % 10 == 0:
+            print(f'counter = {counter}')
 
     return (action, q, r)
 

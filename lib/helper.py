@@ -16,7 +16,7 @@ SECOND = 1
 
 mapNames = ['test1.txt', 'test2.txt']
 playerIdxs = [1, 2, 3, 4]
-matchTime = 9
+matchTime = 2
 
 def craft_aibg_url(url, port):
     return f'http://{SERVER_IP}:{port}/{url}'
@@ -39,7 +39,7 @@ def create_game(token):
     # print(body)
     r = requests.post(craft_aibg_url('game/train', config.PORT), headers=header, json=body)
     # print(f'body {body}')
-    print(f"response: {r.text}")
+    print(f"response: {r.text[:150]}")
 
     if(r.status_code in [200, 202]):
         json.dump(json.loads(json.loads(r.content)["gameState"]),open("../initial_state.json",'w'))
