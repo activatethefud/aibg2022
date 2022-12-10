@@ -5,10 +5,15 @@ import numpy as np
 
 # gets out position from state
 def get_my_position(state) -> Tuple[int, int]:
+    players = []
+    
     try:
-        players = state["scoreBoard"]["players"]
+        names = ['player1', 'player2', 'player3', 'player4']
+        for name in names:
+            players.append(state[name])
     except:
         print("BAD STATE IN get_my_position()", str(state))
+
     myself = [player for player in players if player["name"] == "JutricKafica"][0]
 
     r = myself['r']
@@ -84,8 +89,10 @@ def is_valid_move_tile(pos, map) -> bool:
 
 # checks if the tile contains a player
 def is_player_on_tile(state, q: int, r: int) -> bool:
-    players = state['scoreBoard']['players']
-    players = list([player for player in players])
+    players = []
+    names = ['player1', 'player2', 'player3', 'player4']
+    for name in names:
+        players.append(state[name])
 
     for player in players:
         pq = player['q']
@@ -104,22 +111,18 @@ def is_valid_attack_tile(pos, state) -> bool:
 
     if not is_valid_coords(pos):
         return False
+    
+    # print(f'pos is valid coords')
 
     mapList = validateMapForValidXTileFunctions(map)
 
     for tile in mapList:
-        #print(f'tile: {tile} \n---------------------\n')
-        # print(f'tile = {tile}')
+
         qq = tile['q']
-        #print(f"qq = {qq}")
-        # if isinstance(qq, str):
-        #     qq = json.load(qq)
 
         rr = tile['r']
-        # if isinstance(qq, str):
-        #     rr = json.load(rr)
-        
-        if int(qq) == q and int(qq) == r:
+
+        if int(qq) == q and int(rr) == r:
             typ = tile["entity"]['type']
             return typ == "BOSS" or typ == "ASTEROID" or is_player_on_tile(state, q, r)
 
@@ -168,13 +171,33 @@ def pick_rand_agg_action(state) -> Tuple[str, int, int]:
     dq_list = list([-3, -2, -1, 0, 1, 2, 3])
     random.shuffle(dq_list)
     
-    for dr in dr_list:
-        for dq in dq_list:
-            if is_valid_action(action, q, r, state):
-                q += dq
-                r += dr
-                print(f'will shoot')
-                return (action, q, r)
+        
+    # players = state["scoreBoard"]["players"]
+    players = []
+
+    names = ['player1', 'player2', 'player3', 'player4']
+    for name in names:
+        players.append(state[name])
+
+    for p in players:
+        ppq = p['q']
+        ppr = p['r']
+
+        #print(f'player  q:{ppq}, r:{ppr}\nour   q:{q}, r:{r}')
+
+        if not (ppq == q and ppr == r) and (abs(ppq - q) < 4 and abs(ppr - r) < 4):
+            print(f'player  q:{ppq}, r:{ppr}')
+            return (action, ppq, ppr)
+
+    # for dr in dr_list:
+    #     for dq in dq_list:
+    #         if dq == 0 and dr == 0:
+    #             continue
+    #         newq = q + dq
+    #         newr = r + dr
+    #         if is_valid_action(action, newq, newr, state):
+    #             print(f'will shoot q:{newq}, r:{newr}')
+    #             return (action, newq, newr)
 
     q, r = get_my_position(state)
     action = 'move'
@@ -186,10 +209,10 @@ def pick_rand_agg_action(state) -> Tuple[str, int, int]:
 
     for dr in dr_list:
         for dq in dq_list:
-            if is_valid_action(action, q, r, state):
-                q += dq
-                r += dr
-                return (action, q, r)
+            newq = q + dq
+            newr = r + dr
+            if is_valid_action(action, newq, newr, state):
+                return (action, newq, newr)
 
     return (action, q, r)
 
