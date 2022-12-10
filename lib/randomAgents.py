@@ -90,6 +90,11 @@ def is_valid_attack_tile(pos, state) -> bool:
             typ = tile["entity"]['type']
             return typ == "BOSS" or typ == "ASTEROID" or is_player_on_tile(state, q, r)
 
+# checks if there is an object blocking out attack
+# (q,  r) is out position
+# (tq, tr) is 
+# def exists_blocking_object(q: int, r: int, tq: int, tr: int) -> bool:
+
 # checks if the given action is legal for the given state
 def is_valid_action(action: str, new_q: int, new_r: int, state) -> bool:
     q, r = get_my_position(state)
@@ -105,6 +110,8 @@ def is_valid_action(action: str, new_q: int, new_r: int, state) -> bool:
         if abs(q - new_q) > 3 or abs(r - new_r) > 3 or (new_q == 0 and new_r == 0):
             print("This is a fuckup in a PICK ACTION function, for ATTACK action")
             return False
+        # if exists_blocking_object(q, r, new_q, new_r):
+        #     return False
         return is_valid_attack_tile(state)
     else:
         print(f"This is a fuckup in a PICK ACTION function, invalid action: {action}")
