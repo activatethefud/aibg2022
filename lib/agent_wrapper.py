@@ -30,9 +30,8 @@ def action(player_id: int, agent_id: str, old_state: dict, data: dict):
 
 
     if(resp.status_code in [200, 202]):
-
+        new_state = json.loads(resp.content)
         try:
-            new_state = json.loads(resp.content)
             gameState = json.loads(new_state["gameState"])
             players = gameState["scoreBoard"]["players"]
 
@@ -45,16 +44,18 @@ def action(player_id: int, agent_id: str, old_state: dict, data: dict):
         except:
             reward = 0
 
-        return db.add_experience(
+        db.add_experience(
             agent_id,
             old_state,
             data,
             new_state,
             reward
         )
+
+        return new_state, True
     
     else:
-        return resp
+        return resp, False
 
 
 
