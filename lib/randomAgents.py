@@ -8,9 +8,9 @@ def get_my_position(state) -> Tuple[int, int]:
     players = []
     
     try:
-        names = ['player1', 'player2', 'player3', 'player4']
-        for name in names:
-            players.append(state[name])
+        ps = ['player1', 'player2', 'player3', 'player4']
+        for pl in ps:
+            players.append(state[pl])
     except:
         print("BAD STATE IN get_my_position()", str(state))
 
@@ -46,8 +46,7 @@ def pick_rand_action(state) -> Tuple[str, int, int]:
     return (action, q, r)
 
 # checks if the position is out of bounds for the map
-def is_valid_coords(pos) -> bool:
-    q, r = pos[0], pos[1]
+def is_valid_coords(q: int, r: int) -> bool:
     if q < -14 or q > 14:
         return False
     if r < -14 or r > 14:
@@ -75,17 +74,15 @@ def validateMapForValidXTileFunctions(map):
 
 # checks if it is legal to move to position pos
 # does NOT check if the player is next to the pos 
-def is_valid_move_tile(pos, map) -> bool:
-    q, r = pos[0], pos[1]
-
-    if not is_valid_coords(pos):
+def is_valid_move_tile(q, r, map) -> bool:
+    if not is_valid_coords(q, r):
         return False
 
     map = validateMapForValidXTileFunctions(map)
 
     for tile in map:
         if int(tile['q']) == q and int(tile['r']) == r:
-            return tile["tileType"] == "NORMAL"
+            return (tile["tileType"] == "NORMAL" and tile['entity']['type'] != 'ASTEROID')
 
 # checks if the tile contains a player
 def is_player_on_tile(state, q: int, r: int) -> bool:
@@ -105,21 +102,16 @@ def is_player_on_tile(state, q: int, r: int) -> bool:
 
 # checks if it is legal to attack position pos
 # does NOT check if the player is within 3 tiles of pos 
-def is_valid_attack_tile(pos, state) -> bool:
+def is_valid_attack_tile(q: int, r: int, state) -> bool:
     map = state['map']
-    q, r = pos[0], pos[1]
 
-    if not is_valid_coords(pos):
+    if not is_valid_coords(q, r):
         return False
-    
-    # print(f'pos is valid coords')
 
     mapList = validateMapForValidXTileFunctions(map)
 
     for tile in mapList:
-
         qq = tile['q']
-
         rr = tile['r']
 
         if int(qq) == q and int(rr) == r:
@@ -133,19 +125,19 @@ def is_valid_action(action: str, new_q: int, new_r: int, state) -> bool:
     # TODO check if the attack hits an obsticle before target
 
     if action == 'move':
-        if abs(q - new_q) > 1 or abs(r - new_r) > 1 or (new_q == 0 and new_r == 0):
+        if abs(q - new_q) > 1 or abs(r - new_r) > 1 or ((new_q - q) == 0 and (new_r - r) == 0):
             print("This is a fuckup in a PICK ACTION function, for MOVE action")
             return False
         
         map = state['map']
         map = validateMapForValidXTileFunctions(map)
 
-        return is_valid_move_tile((new_q, new_r), map)
+        return is_valid_move_tile(new_q, new_r, map)
     elif action == 'attack':
-        if abs(q - new_q) > 3 or abs(r - new_r) > 3 or (new_q == 0 and new_r == 0):
+        if abs(q - new_q) > 3 or abs(r - new_r) > 3 or ((new_q - q) == 0 and (new_r - r) == 0):
             print("This is a fuckup in a PICK ACTION function, for ATTACK action")
             return False
-        return is_valid_attack_tile((new_q, new_r), state)
+        return is_valid_attack_tile(new_q, new_r, state)
     else:
         print(f"This is a fuckup in a PICK ACTION function, invalid action: {action}")
         return False
@@ -165,14 +157,7 @@ def pick_rand_agg_action(state) -> Tuple[str, int, int]:
     q, r = get_my_position(state)
 
     action = 'attack'
-
-    dr_list = list([-3, -2, -1, 0, 1, 2, 3])
-    random.shuffle(dr_list)
-    dq_list = list([-3, -2, -1, 0, 1, 2, 3])
-    random.shuffle(dq_list)
-    
-        
-    # players = state["scoreBoard"]["players"]
+ 
     players = []
 
     names = ['player1', 'player2', 'player3', 'player4']
@@ -199,7 +184,6 @@ def pick_rand_agg_action(state) -> Tuple[str, int, int]:
     #             print(f'will shoot q:{newq}, r:{newr}')
     #             return (action, newq, newr)
 
-    q, r = get_my_position(state)
     action = 'move'
     
     dr_list = [-1, 0, 1]
@@ -209,12 +193,68 @@ def pick_rand_agg_action(state) -> Tuple[str, int, int]:
 
     for dr in dr_list:
         for dq in dq_list:
+            if dr == 0 and dq == 0:
+                continue
             newq = q + dq
             newr = r + dr
             if is_valid_action(action, newq, newr, state):
                 return (action, newq, newr)
 
     return (action, q, r)
+
+def agg_strat2(state) -> Tuple[str, int, int]:
+    q, r = get_my_position(state)
+
+    action = 'attack'
+    
+    players = []
+
+    names = ['player1', 'player2', 'player3', 'player4']
+    for name in names:
+        players.append(state[name])
+
+    for p in players:
+        ppq = p['q']
+        ppr = p['r']
+
+        if not (ppq == q and ppr == r) and (abs(ppq - q) < 4 and abs(ppr - r) < 4):
+            print(f'player  q:{ppq}, r:{ppr}')
+            return (action, ppq, ppr)
+
+    return pick_random_valid_action(state)
+
+def agg_strat3(state) -> Tuple[str, int, int]:
+    q, r = get_my_position(state)
+
+    action = 'attack'
+    
+    players = []
+
+    names = ['player1', 'player2', 'player3', 'player4']
+    for name in names:
+        players.append(state[name])
+
+    for p in players:
+        ppq = p['q']
+        ppr = p['r']
+
+        if not (ppq == q and ppr == r) and (abs(ppq - q) < 4 and abs(ppr - r) < 4):
+            print(f'player  q:{ppq}, r:{ppr}')
+            return (action, ppq, ppr)
+
+    dr_list = [-2, -1, 0, 1, 2]
+    dq_list = [-2, -1, 0, 1, 2]
+
+    for dr in dr_list:
+        for dq in dq_list:
+            if dq == 0 and dr == 0:
+                continue
+            newq = q + dq
+            newr = r + dr
+            if is_valid_action(action, newq, newr, state):
+                return (action, newq, newr)
+
+    return pick_random_valid_action(state)
 
 # calls the agent_wrapper function to send the execute the given action
 # returns new state and a bool (True -> resp code 200 or 202, otherwise False)
