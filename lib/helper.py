@@ -34,7 +34,7 @@ def create_game(token):
     r = requests.post(craft_aibg_url('game/train', config.PORT), headers=header, json=body)
 
     if(r.status_code in [200, 202]):
-        json.dump(json.loads(r.content),open("../initial_state.json",'w'))
+        json.dump(json.loads(json.loads(r.content)["gameState"]),open("../initial_state.json",'w'))
         return True
     
     return False
