@@ -117,12 +117,12 @@ def pick_random_valid_action(state) -> Tuple[str, int, int]:
 
 # calls the agent_wrapper function to send the execute the given action
 # returns new state and a bool (True -> resp code 200 or 202, otherwise False)
-def do_action(action: str, q: int, r: int) -> Tuple[Any, Any]:
+def do_action(agentID: str, action: str, x: int, y: int) -> Tuple[Any, Any]:
     state, isGoodResp = None, None
     if action == 'move':
-        state, isGoodResp = agent_wrapper.move(q, r)
+        state, isGoodResp = agent_wrapper.move(agentID, x, y)
     else:
-        state, isGoodResp = agent_wrapper.attack(q, r)
+        state, isGoodResp = agent_wrapper.attack(agentID, x, y)
 
     return (state, isGoodResp)
 
