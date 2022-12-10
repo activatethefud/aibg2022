@@ -11,8 +11,11 @@ try:
 except:
     raise Exception("Error with database connection.")
 
-def get_all_experiences():
-    return list(replay_buffer_collection.find())
+def get_one_experience(query = {}):
+    return replay_buffer_collection.find_one(query)
+
+def get_all_experiences(query = {}):
+    return list(replay_buffer_collection.find(query))
 
 def add_experience(agent_id: str, old_state: dict, action: dict, new_state: dict, reward: float):
 
