@@ -11,6 +11,15 @@ try:
 except:
     raise Exception("Error with database connection.")
 
+def clean_db():
+    for doc in replay_buffer_collection.find():
+        tokens = doc["a"]["action"].split(",")
+        num1 = int(tokens[1])
+        num2 = int(tokens[2])
+
+        if not num1 in range(-14, 15) or not num2 in range(-14,15):
+            replay_buffer_collection.delete_one(doc)
+
 def get_one_experience(query = {}):
     return replay_buffer_collection.find_one(query)
 
