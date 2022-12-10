@@ -29,13 +29,12 @@ def action(agent_id: str, old_state: dict, data: dict):
     resp = req.post(craft_aibg_url(ACTION_URL, 8081), headers=HEADERS, json=data)
 
 
-    if(resp.status_code in [200, 202]):
+    if resp.status_code in [200, 202]:
         new_state = json.loads(resp.content)
         try:
-            gameState = json.loads(new_state["gameState"])
-            players = gameState["scoreBoard"]["players"]
-
             def _myself_score(state: dict):
+                gameState = json.loads(state["gameState"])
+                players = gameState["scoreBoard"]["players"]
                 myself = [player for player in players if player["name"] == "JutricKafica"][0]
                 return myself["score"]
         
@@ -70,3 +69,4 @@ def attack(agent_id: str, old_state: dict, x: int, y: int):
     })
 
 #move("test_agent", {"gameState": {"scoreBoard": {"players":[{"name":"JutricKafica","score":0}]}}}, -5,-7)
+
