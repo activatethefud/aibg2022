@@ -4,6 +4,7 @@ import json
 import datetime as dt
 import threading
 import config
+import random
 
 SERVER_IP = 'aibg2022.com'
 CONNECTION_JSON = {
@@ -12,6 +13,10 @@ CONNECTION_JSON = {
 }
 
 SECOND = 1
+
+mapNames = ['test1.txt', 'test2.txt']
+playerIdxs = [1, 2, 3, 4]
+matchTime = 10
 
 def craft_aibg_url(url, port):
     return f'http://{SERVER_IP}:{port}/{url}'
@@ -27,9 +32,9 @@ def create_game(token):
         'Authorization': f'Bearer {token}',
     }
     body = {
-        'mapName': 'test1.txt',
-        'playerIdx': '1',
-        'time': '1'
+        'mapName': f'{random.choices(mapNames)}',
+        'playerIdx': f'{random.choice(playerIdxs)}',
+        'time': f'{matchTime}'
     }
     r = requests.post(craft_aibg_url('game/train', config.PORT), headers=header, json=body)
 
