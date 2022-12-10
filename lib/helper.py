@@ -3,6 +3,7 @@ import time
 import json
 import datetime as dt
 import threading
+import config
 
 SERVER_IP = 'aibg2022.com'
 CONNECTION_JSON = {
@@ -16,7 +17,7 @@ def craft_aibg_url(url, port):
     return f'http://{SERVER_IP}:{port}/{url}'
 
 def get_token():
-    r = requests.post(craft_aibg_url('user/login', 8081), json=CONNECTION_JSON)
+    r = requests.post(craft_aibg_url('user/login', config.PORT), json=CONNECTION_JSON)
     return r.json()['token']
 
 TOKEN = get_token()
@@ -30,7 +31,7 @@ def create_game(token):
         'playerIdx': '1',
         'time': '1'
     }
-    r = requests.post(craft_aibg_url('game/train', 8081), headers=header, json=body)
+    r = requests.post(craft_aibg_url('game/train', config.PORT), headers=header, json=body)
 
     if(r.status_code in [200, 202]):
         json.dump(json.loads(r.content),open("../initial_state.json",'w'))
@@ -51,5 +52,7 @@ game_creation_thread = threading.Thread(
     None,
     keep_creating_games
 )
+
+game_creation_thread.setDaemon(True)
 
 game_creation_thread.start()
