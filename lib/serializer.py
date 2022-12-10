@@ -78,9 +78,11 @@ class GameState1DSerializer():
         
                 res = np.array(tiles_list)
         
-        return np.append(res[:,2],[
-            0 if action[0] == "attack" else 1, action[1], action[2]
-        ])
+        return res[:,2]
+
+    def serialize_action(self, data: dict):
+        action = data["action"].split(",")
+        return [0 if action[0] == "attacK" else 1, action[1], action[2]]
 
     def serialize_multiple(self, states: list):
         pass

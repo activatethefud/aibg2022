@@ -19,6 +19,7 @@ def prepare_training_data(from_timestamp = int(dt.datetime.now().timestamp())):
     return serialized
 
 
+
 r = prepare_training_data(0)
 # Define the model architecture
 model = keras.Sequential()
