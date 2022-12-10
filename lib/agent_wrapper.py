@@ -25,7 +25,7 @@ HEADERS = {
         'Authorization': f'Bearer {TOKEN}',
 }
 
-def action(player_id: int, agent_id: str, old_state: dict, data: dict):
+def action(agent_id: str, old_state: dict, data: dict):
     resp = req.post(craft_aibg_url(ACTION_URL, 8081), headers=HEADERS, json=data)
 
 
@@ -59,14 +59,14 @@ def action(player_id: int, agent_id: str, old_state: dict, data: dict):
 
 
 
-def move(player_id:int, agent_id: str, old_state: dict, x: int, y: int):
-    return action(player_id, agent_id, old_state, {
+def move(agent_id: str, old_state: dict, x: int, y: int):
+    return action(agent_id, old_state, {
         "action": f"move,{x},{y}"
     })
 
-def attack(player_id: int, agent_id: str, old_state: dict, x: int, y: int):
-    return action(player_id, agent_id, old_state, {
+def attack(agent_id: str, old_state: dict, x: int, y: int):
+    return action(agent_id, old_state, {
         "attack": f"attack,{x},{y}"
     })
 
-#move(1, "test_agent", {"gameState": {"scoreBoard": {"players":[{"name":"JutricKafica","score":0}]}}}, -5,-7)
+#move("test_agent", {"gameState": {"scoreBoard": {"players":[{"name":"JutricKafica","score":0}]}}}, -5,-7)
