@@ -8,7 +8,7 @@ import random
 
 SERVER_IP = 'aibg2022.com'
 CONNECTION_JSON = {
-    'username': 'JutricKafica',
+    'username': 'JutricKafica1',
     'password': 'q8K^Hx9%L6'
 }
 
