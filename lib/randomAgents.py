@@ -223,6 +223,39 @@ def agg_strat2(state) -> Tuple[str, int, int]:
 
     return pick_random_valid_action(state)
 
+def agg_strat3(state) -> Tuple[str, int, int]:
+    q, r = get_my_position(state)
+
+    action = 'attack'
+    
+    players = []
+
+    names = ['player1', 'player2', 'player3', 'player4']
+    for name in names:
+        players.append(state[name])
+
+    for p in players:
+        ppq = p['q']
+        ppr = p['r']
+
+        if not (ppq == q and ppr == r) and (abs(ppq - q) < 4 and abs(ppr - r) < 4):
+            print(f'player  q:{ppq}, r:{ppr}')
+            return (action, ppq, ppr)
+
+    dr_list = [-2, -1, 0, 1, 2]
+    dq_list = [-2, -1, 0, 1, 2]
+
+    for dr in dr_list:
+        for dq in dq_list:
+            if dq == 0 and dr == 0:
+                continue
+            newq = q + dq
+            newr = r + dr
+            if is_valid_action(action, newq, newr, state):
+                return (action, newq, newr)
+
+    return pick_random_valid_action(state)
+
 # calls the agent_wrapper function to send the execute the given action
 # returns new state and a bool (True -> resp code 200 or 202, otherwise False)
 def do_action(agentID: str, oldState, action: str, x: int, y: int) -> Tuple[Any, Any]:
