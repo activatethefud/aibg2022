@@ -68,4 +68,4 @@ def attack(player_id: int, agent_id: str, old_state: dict, x: int, y: int):
         "attack": f"attack,{x},{y}"
     })
 
-move(1, "test_agent", {"gameState": {"scoreBoard": {"players":[{"name":"JutricKafica","score":0}]}}}, -5,-7)
+#move(1, "test_agent", {"gameState": {"scoreBoard": {"players":[{"name":"JutricKafica","score":0}]}}}, -5,-7)
