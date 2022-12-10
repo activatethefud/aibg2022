@@ -37,7 +37,6 @@ def action(agent_id: str, old_state: dict, data: dict):
                 players = gameState["scoreBoard"]["players"]
                 myself = [player for player in players if player["name"] == "JutricKafica"][0]
                 return myself["score"]
-        
 
             reward = _myself_score(new_state) - _myself_score(old_state)
         except:
@@ -65,7 +64,7 @@ def move(agent_id: str, old_state: dict, x: int, y: int):
 
 def attack(agent_id: str, old_state: dict, x: int, y: int):
     return action(agent_id, old_state, {
-        "attack": f"attack,{x},{y}"
+        "action": f"attack,{x},{y}"
     })
 
 #move("test_agent", {"gameState": {"scoreBoard": {"players":[{"name":"JutricKafica","score":0}]}}}, -5,-7)
